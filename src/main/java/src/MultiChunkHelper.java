@@ -7,7 +7,7 @@ import java.util.Random;
 
 public class MultiChunkHelper {
 
-    //TODO I use these values a lot - maybe a math class?
+    //TODO I use these values a lot - maybe a math class??
     private static final long m1 = 25214903917L; //the next 5 lines are constants for the lcg created by calling java lcg multiple times.
 
     private static final long m2 = 205749139540585L;
