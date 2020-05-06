@@ -1,9 +1,6 @@
-package src;
-
 import java.awt.Point;
 import java.util.ArrayList;
 import java.math.BigInteger;
-import src.CarverReversalHelper;
 
 public class ChunkRandomReverser {
 
@@ -107,8 +104,8 @@ public class ChunkRandomReverser {
      * @param chunkDz the z of the second chunkseed minus the z of the first, chunk coordinates
      * @return a list of all worldseeds and coords at which the chunkseeds can be found on those worldseeds.
      */
-    public ArrayList<src.MultiChunkHelper.Result> getWorldseedFromTwoChunkseeds(long chunkseed1, long chunkseed2, int chunkDx, int chunkDz) {
-        src.MultiChunkHelper helper = new src.MultiChunkHelper();
+    public ArrayList<MultiChunkHelper.Result> getWorldseedFromTwoChunkseeds(long chunkseed1, long chunkseed2, int chunkDx, int chunkDz) {
+        MultiChunkHelper helper = new MultiChunkHelper();
         return helper.getWorldseedFromTwoChunkseeds(chunkseed1, chunkseed2, chunkDx, chunkDz);
     }
 
