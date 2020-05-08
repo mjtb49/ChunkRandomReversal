@@ -1,3 +1,9 @@
+package mjtb49.hashreversals;
+
+import mjtb49.hashreversals.CarverReversalHelper;
+import mjtb49.hashreversals.MultiChunkHelper;
+import mjtb49.hashreversals.PopulationReversalHelper;
+
 import java.awt.Point;
 import java.util.ArrayList;
 import java.math.BigInteger;

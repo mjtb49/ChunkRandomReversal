@@ -1,3 +1,5 @@
+package mjtb49.hashreversals;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;

@@ -1,3 +1,5 @@
+package mjtb49.hashreversals;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -15,17 +17,6 @@ public class CarverReversalHelper {
     private static final long m4 = 55986898099985L;
     private static final long addend4 = 49720483695876L;
 
-    private static int countTrailingZeroes(long v) {
-        int c;  // output: c will count v's trailing zero bits,
-        // so if v is 1101000 (base 2), then c will be 3
-        v = (v ^ (v - 1)) >> 1;  // Set v's trailing 0s to 1s and zero rest
-        for (c = 0; v !=0; c++)
-        {
-            v >>>= 1;
-        }
-        return c;
-    }
-
     private long getPartialCarverSeed(long bitsOfSeed, int x, int z) {
         long a = (((m2*(bitsOfSeed ^ m1)+addend2) & makeMask(48) )>>>16);
         long b = (((m4*(bitsOfSeed ^ m1)+addend4) & makeMask(48) )>>>16);
@@ -40,11 +31,10 @@ public class CarverReversalHelper {
     }
 
     private int countMatchingLowOrderBits(long a, long b) {
-        return countTrailingZeroes(a ^ b);
+        return Long.numberOfTrailingZeros(a ^ b);
     }
 
     ArrayList<Long> reverseCarverSeed(long carverSeed, int x, int z) {
-
 
         ArrayList<Long> results = new ArrayList<>();
 
