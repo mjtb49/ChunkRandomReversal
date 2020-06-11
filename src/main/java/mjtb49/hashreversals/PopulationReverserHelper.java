@@ -123,16 +123,16 @@ class PopulationReversalHelper {
             c = (chunkseed & 1);
         }*/
 
+        HashSet<Integer> possibleRoundingOffsets= new HashSet<>();
+        for (int i = 0; i < 2; i++) for (int j = 0; j < 2; j++)
+            possibleRoundingOffsets.add(x*i+j*z);
+
         for (; c < (1L << 16); c+= (1 << (totalCount + 1))) { //iterate through all possible lower 16 bits of worldseed.
             //System.out.println(c);
             long target = (c ^ f) & mask16; //now that we've guessed 16 bits of worldseed we can undo the mask
 
             //We need to handle the four different cases of the effect the two |1s have on the seed
             long magic = x * ((m2 * ((c ^ m1) & mask16) + addend2) >>> 16) + z * ((m4 * ((c ^ m1) & mask16) + addend4) >>> 16);
-
-            HashSet<Integer> possibleRoundingOffsets= new HashSet<>();
-            for (int i = 0; i < 2; i++) for (int j = 0; j < 2; j++)
-                possibleRoundingOffsets.add(x*i+j*z);
 
             for (int i: possibleRoundingOffsets)
                 addWorldSeed13Plus(target - ((magic +i) & mask16), multTrailingZeroes, firstMultInv, c, e, x, z, chunkseed,worldseeds); //case both nextLongs were odd
@@ -207,18 +207,16 @@ class PopulationReversalHelper {
         int zcount = countTrailingZeroes(z);
         int totalCount = countTrailingZeroes(x|z);
 
+        HashSet<Integer> possibleRoundingOffsets= new HashSet<>();
+        for (int i = 0; i < 3; i++) for (int j = 0; j < 3; j++)
+            possibleRoundingOffsets.add(x*i+j*z);
+
         c = xcount == zcount ? chunkseed & ((1 << (xcount + 1)) - 1): chunkseed & ((1 << (totalCount + 1)) - 1) ^ (1 << totalCount);
         for (; c < (1L << 16); c+= (1 << (totalCount + 1))) { //iterate through all possible lower 16 bits of worldseed.
             //System.out.println(c);
             long target = (c ^ f) & mask16; //now that we've guessed 16 bits of worldseed we can undo the mask
             //We need to handle the four different cases of the effect the two |1s have on the seed
             long magic = x * ((m2 * ((c ^ m1) & mask16) + addend2) >>> 16) + z * ((m4 * ((c ^ m1) & mask16) + addend4) >>> 16);
-
-            //TODO Many of these checks can be unneeded if there is collision among the firstAddend values. For example if 2x+z = x+2z you only need to check one of them.
-            //TODO Investigate possibility algorithm may return same seed multiple times. Think it shouldn't occur if you avoid collision as above, but perhaps rarely?
-            HashSet<Integer> possibleRoundingOffsets= new HashSet<>();
-            for (int i = 0; i < 3; i++) for (int j = 0; j < 3; j++)
-                possibleRoundingOffsets.add(x*i+j*z);
 
             for (int i: possibleRoundingOffsets)
                 addWorldSeedPre13(target - ((magic + i) & mask16), multTrailingZeroes, firstMultInv, c, x, z, chunkseed,worldseeds); //case both nextLongs were odd
