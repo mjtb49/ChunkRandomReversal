@@ -1,5 +1,8 @@
 package mjtb49.hashreversals;
 
+import kaptainwutax.seedutils.mc.pos.BPos;
+import kaptainwutax.seedutils.mc.pos.CPos;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Arrays;
@@ -11,6 +14,12 @@ public class TwoDimBigVector {
     protected TwoDimBigVector() {
         vector = new BigDecimal[SIZE];
         Arrays.fill(vector, BigDecimal.ZERO);
+    }
+
+    protected TwoDimBigVector(long a, long b) {
+        vector = new BigDecimal[SIZE];
+        vector[0] = BigDecimal.valueOf(a);
+        vector[1] = BigDecimal.valueOf(b);
     }
 
     protected TwoDimBigVector(BigDecimal a, BigDecimal b) {
@@ -69,6 +78,18 @@ public class TwoDimBigVector {
 
     protected BigDecimal normSq() {
         return (vector[0].pow(2).add(vector[1].pow(2)));
+    }
+
+    protected CPos toCpos() {
+        return new CPos((int) vector[0].longValue(), (int) vector[1].longValue());
+    }
+
+    protected BPos toBpos() {
+        return new BPos((int) vector[0].longValue(), 0,(int) vector[1].longValue());
+    }
+
+    protected BPos toBpos(int y) {
+        return new BPos((int) vector[0].longValue(), y,(int) vector[1].longValue());
     }
 
     public String toString(){

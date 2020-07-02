@@ -20,39 +20,15 @@ public class ChunkRandomReverser {
     }
 
     public CPos reverseTerrainSeed(long terrainSeed, int minX, int maxX, int minZ, int maxZ) {
-        //12354965 , 2831608 is the smallest vector along which the terrain seed remains unchanged.
-        //989088 , 23009024
-
-        // 23009024 , -2831608
-        //-989088 , 12354965
-        long firstSolutionZ = (211541297333629L * terrainSeed) & Mth.MASK_48;
-        BigInteger trueMaxX = BigInteger.valueOf(minX);
-        BigInteger trueMinX = BigInteger.valueOf(maxX);
-        BigInteger trueMaxZ = BigInteger.valueOf(maxZ - firstSolutionZ);
-        BigInteger trueMinZ = BigInteger.valueOf(minZ - firstSolutionZ);
-
-        //Rounding properly is hard
-        long maxXT = trueMaxX.multiply(BigInteger.valueOf(23009024)).add(trueMinZ.multiply(BigInteger.valueOf(-989088))).divide(BigInteger.valueOf(BEEG)).longValue();
-        long minXT = trueMinX.multiply(BigInteger.valueOf(23009024)).add(trueMaxZ.multiply(BigInteger.valueOf(-989088))).divide(BigInteger.valueOf(BEEG)).longValue();
-        long maxZT = trueMinX.multiply(BigInteger.valueOf(-2831608)).add(trueMaxZ.multiply(BigInteger.valueOf(12354965))).divide(BigInteger.valueOf(BEEG)).longValue();
-        long minZT = trueMaxX.multiply(BigInteger.valueOf(-2831608)).add(trueMinZ.multiply(BigInteger.valueOf(12354965))).divide(BigInteger.valueOf(BEEG)).longValue();
-
-        //TODO make sure this can't overflow
-        for (long i = minXT - 1; i <= maxXT + 1; i++) {
-            for (long j = minZT - 1; j <= maxZT + 1; j++) {
-                //System.out.println(i+" "+j);
-                long tempX = 12354965L * i +  989088L * j; //  +
-                long tempZ = 2831608L* i + 23009024L * j + firstSolutionZ;
-                if (minX <= tempX && tempX <= maxX && minZ <= tempZ && tempZ <= maxZ) {
-                    return new CPos((int)tempX, (int) tempZ);
-                }
-            }
+        ArrayList<TwoDimBigVector> results = FindSolutionsInBox.findSolutionsInBox(341873128712L, 132897987541L, terrainSeed, (1L << 48), new TwoDimBigVector(minX,minZ), new TwoDimBigVector(maxX, maxZ));
+        switch (results.size()) {
+            case 0:
+                return null;
+            case 1:
+                return results.get(0).toCpos();
+            default:
+                throw new IndexOutOfBoundsException("Bounds too large to indentify a unique seed. If this is actually a problem for some horrifying future version of minecraft open a github issue but as of right now this should never run so I am legally allowed to write a long and funny error message instead of something more helpful.");
         }
-        return null;
-    }
-
-    public long setTerrainSeed(long chunkX, long chunkZ, MCVersion version) {
-        return (chunkX * 341873128712L + chunkZ * 132897987541L) & Mth.MASK_48;
     }
 
     public CPos reverseRegionSeed(long regionSeed, long worldSeed, int salt, MCVersion version) {

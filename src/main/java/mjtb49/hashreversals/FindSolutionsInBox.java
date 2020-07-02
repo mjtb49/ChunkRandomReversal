@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class FindSolutionsInBox {
 
-    protected static TwoDimBigMatrix lagrangeGauss(TwoDimBigMatrix matrix) {
+    private static TwoDimBigMatrix lagrangeGauss(TwoDimBigMatrix matrix) {
         TwoDimBigMatrix r = new TwoDimBigMatrix(matrix);
         do {
             if (r.getRow(0).normSq().compareTo( r.getRow(1).normSq()) > 0) {
@@ -24,9 +24,10 @@ public class FindSolutionsInBox {
     /**
      * Solves for a*x + b*z = target - c (modulo mod) under the condition that min < (x,z) < max
      */
-    protected static ArrayList<TwoDimBigVector> findSolutionsInBox(long a, long b, long c, long target, long mod, TwoDimBigVector min, TwoDimBigVector max) {
-        target = (target - c) % mod; //from here on we can think of this as solving a*x + b*z = target
+    public static ArrayList<TwoDimBigVector> findSolutionsInBox(long a, long b, long target, long mod, TwoDimBigVector min, TwoDimBigVector max) {
+        target = (target) % mod; //from here on we can think of this as solving a*x + b*z = target
         BigInteger bigMod = BigInteger.valueOf(mod);
+        //TODO b is not necessarily invertible
         BigInteger binv = BigInteger.valueOf(b).modInverse(bigMod);
 
         //We find all solutions by constructing this trivial solution then adding vectors until it is within the bounds
