@@ -80,7 +80,7 @@ public class ChunkRandomReverser {
      */
     public ArrayList<MultiChunkHelper.Result> getWorldseedFromTwoChunkseeds(long chunkseed1, long chunkseed2, int chunkDx, int chunkDz) {
         MultiChunkHelper helper = new MultiChunkHelper();
-        return helper.getWorldseedFromTwoChunkseeds(chunkseed1, chunkseed2, chunkDx, chunkDz);
+        return helper.getWorldseedFromTwoChunkseeds(chunkseed1, chunkseed2, 16*chunkDx, 16*chunkDz);
     }
 
     //TODO - Slime chunk Reversal

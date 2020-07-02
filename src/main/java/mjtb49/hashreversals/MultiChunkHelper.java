@@ -54,10 +54,10 @@ public class MultiChunkHelper {
         return ((x*a + z*b)^seed) & ((1L << 48) - 1);
     }
 
-    ArrayList<Result> getWorldseedFromTwoChunkseeds(long chunkseed1, long chunkseed2, int chunkDx, int chunkDz) {
+    ArrayList<Result> getWorldseedFromTwoChunkseeds(long chunkseed1, long chunkseed2, int blockDx, int blockDz) {
         results = new ArrayList<>();
-        this.dx = chunkDx*16;
-        this.dz = chunkDz*16;
+        this.dx = blockDx;
+        this.dz = blockDz;
         k1 = chunkseed1;
         k2 = chunkseed2;
         for (long c = 0; c < (1L << 17); c++) {

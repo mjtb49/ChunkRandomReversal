@@ -208,6 +208,7 @@ public class PopulationReverser {
             long target = (c ^ f) & Mth.MASK_16; //now that we've guessed 16 bits of worldseed we can undo the mask
             //We need to handle the four different cases of the effect the two |1s have on the seed
             long magic = x * ((M2 * ((c ^ M1) & Mth.MASK_16) + A2) >>> 16) + z * ((M4 * ((c ^ M1) & Mth.MASK_16) + A4) >>> 16);
+
             for (int i: possibleRoundingOffsets)
                 addWorldSeedPre13(target - ((magic + i) & Mth.MASK_16), multTrailingZeroes, firstMultInv, c, x, z, chunkseed,worldseeds); //case both nextLongs were odd
         }
