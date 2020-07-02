@@ -29,21 +29,21 @@ public class MultiChunkHelper {
     }
 
     private static long makeMask(int bits) {
-        return (1L << bits) - 1;
+        if (bits == 64)
+            return -1;
+        else
+            return (1L << bits) - 1;
     }
 
-    private static long modInverse(long x, int mod) { //Fast method for modular inverse mod powers of 2
-        long inv = 0;
-        long b = 1;
-        for (int i = 0; i < mod; i++) {
-            if ((b & 1)==1) {
-                inv |= 1L << i;
-                b = (b - x) >> 1;
-            } else {
-                b >>= 1;
-            }
-        }
-        return inv;
+    private static long modInverse(long a, int mod) { //Fast method for modular inverse mod powers of 2
+        long x = (((a << 2) ^ (a << 1)) & 4) ^ a;
+
+        x += x - a * x * x;
+        x += x - a * x * x;
+        x += x - a * x * x;
+        x += x - a * x * x;
+
+        return x & makeMask(mod);
     }
 
     private static long getA( long partialSeed, int bits) {
@@ -206,6 +206,10 @@ public class MultiChunkHelper {
 
         public long getBitsOfSeed() {
             return bitsOfSeed;
+        }
+
+        public String toString() {
+            return bitsOfSeed+" at "+x+" "+z;
         }
     }
 }
