@@ -1,5 +1,6 @@
 package mjtb49.hashreversals;
 
+import kaptainwutax.seedutils.mc.ChunkRand;
 import kaptainwutax.seedutils.mc.MCVersion;
 import kaptainwutax.seedutils.mc.pos.CPos;
 import kaptainwutax.seedutils.util.UnsupportedVersion;
@@ -7,6 +8,7 @@ import kaptainwutax.seedutils.util.math.Mth;
 
 import java.util.ArrayList;
 import java.math.BigInteger;
+import java.util.List;
 
 public class ChunkRandomReverser {
 
@@ -67,18 +69,18 @@ public class ChunkRandomReverser {
 
     /**
      * Reverses the population seed hash (x*nextLong() + z*nextLong() ^ seed)
-     * @param seed the population seed
+     * @param populationSeed the population seed
      * @param x the x chunk coordinate to find the seed at
      * @param z the z chunk coordinate to find the seed at
      * @return list of worldseeds with the given population seed at the desired location
      */
-    public ArrayList<Long> reversePopulationSeed(long seed, int x, int z, MCVersion version) {
+    public List<Long> reversePopulationSeed(long populationSeed, int x, int z, MCVersion version) {
         //TODO: Kill this eventually.
         if(version.isOlderThan(MCVersion.v1_13)) {
-            return PopulationReverser.getSeedFromChunkseedPre13(seed & Mth.MASK_48, x, z);
+            return PopulationReverser.getSeedFromChunkseedPre13(populationSeed & Mth.MASK_48, x, z);
         }
 
-        return PopulationReverser.reverse(seed & Mth.MASK_48, x, z, version);
+        return PopulationReverser.reverse(populationSeed & Mth.MASK_48, x, z, new ChunkRand(), version);
     }
 
     /**
@@ -88,8 +90,8 @@ public class ChunkRandomReverser {
      * @param z the z coordinate of the chunk
      * @return a list of worldseeds with the given carver seed at the desired location
      */
-    public ArrayList<Long> reverseCarverSeed(long carverSeed, int x, int z) {
-        return CarverReversalHelper.reverseCarverSeed(carverSeed & Mth.MASK_48, x ,z);
+    public List<Long> reverseCarverSeed(long carverSeed, int x, int z, MCVersion version) {
+        return CarverReverser.reverse(carverSeed & Mth.MASK_48, x, z, new ChunkRand(), version);
     }
 
     /**
