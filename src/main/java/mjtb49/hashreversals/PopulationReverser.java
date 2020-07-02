@@ -8,6 +8,7 @@ import kaptainwutax.seedutils.util.math.Mth;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 
 public class PopulationReverser {
@@ -30,27 +31,30 @@ public class PopulationReverser {
         }
     }
 
-    public static ArrayList<Long> reverse(long populationSeed, int x, int z, MCVersion version) {
+    public static List<Long> reverse(long populationSeed, int x, int z, ChunkRand rand, MCVersion version) {
         ArrayList<Long> worldSeeds = new ArrayList<>();
 
-        int c; //a is upper 16 bits, b middle 16 bits, c lower 16 bits of worldSeed.
+        long c; //a is upper 16 bits, b middle 16 bits, c lower 16 bits of worldSeed.
         long e = populationSeed & Mth.MASK_32; //The algorithm proceeds by solving for worldSeed in 16 bit groups
         long f = populationSeed & Mth.MASK_16; //as such, we need the 16 bit groups of populationSeed for later eqns.
 
         int freeBits = Long.numberOfTrailingZeros(x | z);
-        c = (int)(populationSeed & Mth.mask(freeBits));
-        c |= (x ^ z ^ populationSeed) & Mth.pow2(freeBits);
-        int increment = (int)Mth.pow2(freeBits + 1);
+        c = populationSeed & Mth.mask(freeBits);
+        c |= freeBits == 64 ? 0 : (x ^ z ^ populationSeed) & Mth.pow2(freeBits++);
+        int increment = (int)Mth.pow2(freeBits);
 
         long firstMultiplier = (M2 * x + M4 * z) & Mth.MASK_16;
         int multTrailingZeroes = Long.numberOfTrailingZeros(firstMultiplier);
 
-        //Exploden't Hensel!
         if(multTrailingZeroes >= 16) {
-            Hensel.Hash popHash = value -> ChunkSeeds.getPopulationSeed(value, x, z, version);
+            Hensel.Hash popHash = value -> rand.setPopulationSeed(value, x, z, version);
 
-            for(c &= Mth.MASK_16; c < 1L << 16; c += increment) {
-                Hensel.lift(c, Math.min(freeBits + 1, 32), populationSeed, 32, 16, popHash, worldSeeds);
+            if(freeBits >= 16) {
+                Hensel.lift(c, freeBits - 16, populationSeed, 32, 16, popHash, worldSeeds);
+            } else {
+                for(; c < 1L << 16; c += increment) {
+                    Hensel.lift(c, 0, populationSeed, 32, 16, popHash, worldSeeds);
+                }
             }
 
             return worldSeeds;
@@ -69,7 +73,7 @@ public class PopulationReverser {
 
             for(int offset: offsets) {
                 addWorldSeeds(target - ((magic + offset) & Mth.MASK_16), multTrailingZeroes,
-                        firstMultInv, c, e, x, z, populationSeed, worldSeeds, version);
+                        firstMultInv, c, e, x, z, populationSeed, worldSeeds, rand, version);
             }
         }
 
@@ -77,7 +81,7 @@ public class PopulationReverser {
     }
 
     private static void addWorldSeeds(long firstAddend, int multTrailingZeroes, long firstMultInv, long c, long e,
-                               int x, int z, long populationSeed, ArrayList<Long> worldSeeds, MCVersion version) {
+                               int x, int z, long populationSeed, ArrayList<Long> worldSeeds, ChunkRand rand, MCVersion version) {
         //Does there exist a set of 16 bits which work for bits 17-32
         if(Long.numberOfTrailingZeros(firstAddend) < multTrailingZeroes)return;
 
@@ -85,7 +89,6 @@ public class PopulationReverser {
         long increment = Mth.pow2(16 - multTrailingZeroes);
 
         long b = (((firstMultInv * firstAddend) >>> multTrailingZeroes)^(M1 >> 16)) & mask;
-        ChunkRand rand = new ChunkRand();
 
         //if the previous multiplier had a power of 2 divisor, we get multiple solutions for b
         for(; b < (1L << 16); b += increment) {
