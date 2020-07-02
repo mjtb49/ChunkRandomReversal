@@ -79,6 +79,22 @@ public class TwoDimBigMatrix {
         return result;
     }
 
+    protected TwoDimBigVector multiply(TwoDimBigVector vec) {
+        TwoDimBigVector result = new TwoDimBigVector();
+        result.setElement(0, getRow(0).dot(vec));
+        result.setElement(1, getRow(1).dot(vec));
+        return result;
+    }
+
+    protected TwoDimBigMatrix transpose() {
+        TwoDimBigMatrix result = new TwoDimBigMatrix();
+        result.setElement(getElement(0,0), 0,0);
+        result.setElement(getElement(1,0), 0,1);
+        result.setElement(getElement(0,1), 1,0);
+        result.setElement(getElement(1,1), 1,1);
+        return result;
+    }
+
     protected BigDecimal det() {
         return matrix[0][0].multiply(matrix[1][1]).subtract(matrix[1][0].multiply(matrix[0][1]));
     }
@@ -102,33 +118,15 @@ public class TwoDimBigMatrix {
         return result;
     }
 
-    protected TwoDimBigMatrix lagrangeGauss() {
-        TwoDimBigMatrix r = new TwoDimBigMatrix(this);
-        do {
-            if (r.getRow(0).normSq().compareTo( r.getRow(1).normSq()) > 0) {
-                r = r.swapRows();
-            }
-            BigDecimal mu = r.getRow(0).dot(r.getRow(1))
-                    .divide(r.getRow(0).normSq(), RoundingMode.HALF_UP).setScale(0, RoundingMode.HALF_UP);
-            TwoDimBigVector temp = r.getRow(0).scale(mu.negate());
-            r.setRow(1, r.getRow(1).add(temp));
-        } while (r.getRow(0).normSq().compareTo(r.getRow(1).normSq()) > 0);
-        return r;
+    protected TwoDimBigMatrix swapCols() {
+        TwoDimBigMatrix result = new TwoDimBigMatrix();
+        result.setCol(0, this.getCol(1));
+        result.setCol(1, this.getCol(0));
+        return result;
     }
 
     @Override
     public String toString() {
         return "[ "+ matrix[0][0] +" " + matrix[0][1]+" ]\n" + "[ "+ matrix[1][0] +" " + matrix[1][1]+" ]";
-    }
-
-    public static void main(String[] args) {
-        TwoDimBigMatrix r = new TwoDimBigMatrix();
-        r.setElement(3,0,0);
-        r.setElement(2,1,0);
-        r.setElement(7,0,1);
-        r.setElement(3,1,1);
-        System.out.println(r);
-        System.out.println(r.lagrangeGauss());
-        System.out.println(r);
     }
 }

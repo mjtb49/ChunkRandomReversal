@@ -39,6 +39,13 @@ public class TwoDimBigVector {
         return result;
     }
 
+    protected TwoDimBigVector multiply(TwoDimBigMatrix matrix) {
+        TwoDimBigVector result = new TwoDimBigVector();
+        result.setElement(0,this.dot(matrix.getCol(0)));
+        result.setElement(1,this.dot(matrix.getCol(1)));
+        return result;
+    }
+
     protected TwoDimBigVector scale(BigDecimal scalar) {
         TwoDimBigVector result = new TwoDimBigVector();
         for (int i = 0; i < SIZE; i++) {
@@ -55,7 +62,16 @@ public class TwoDimBigVector {
         return result;
     }
 
+    protected boolean le(TwoDimBigVector other) {
+        return ((vector[0].compareTo(other.getElement(0))) <= 0) &&
+                ((vector[1].compareTo(other.getElement(1))) <= 0);
+    }
+
     protected BigDecimal normSq() {
         return (vector[0].pow(2).add(vector[1].pow(2)));
+    }
+
+    public String toString(){
+        return "[ "+vector[0]+" "+vector[1]+" ]";
     }
 }
