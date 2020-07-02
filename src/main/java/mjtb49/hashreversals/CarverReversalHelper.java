@@ -17,24 +17,24 @@ public class CarverReversalHelper {
     private static final long m4 = 55986898099985L;
     private static final long addend4 = 49720483695876L;
 
-    private long getPartialCarverSeed(long bitsOfSeed, int x, int z) {
+    private static long getPartialCarverSeed(long bitsOfSeed, int x, int z) {
         long a = (((m2*(bitsOfSeed ^ m1)+addend2) & makeMask(48) )>>>16);
         long b = (((m4*(bitsOfSeed ^ m1)+addend4) & makeMask(48) )>>>16);
         return ((x*a ^ z*b) ^ bitsOfSeed) & makeMask(32);
     }
 
-    private long getCarverSeed(long worldSeed, int chunkX, int chunkZ) {
+    private static long getCarverSeed(long worldSeed, int chunkX, int chunkZ) {
         Random r = new Random(worldSeed);
         long long6 = r.nextLong();
         long long8 = r.nextLong();
         return (chunkX * long6 ^ chunkZ * long8 ^ worldSeed) & makeMask(48);
     }
 
-    private int countMatchingLowOrderBits(long a, long b) {
+    private static int countMatchingLowOrderBits(long a, long b) {
         return Long.numberOfTrailingZeros(a ^ b);
     }
 
-    ArrayList<Long> reverseCarverSeed(long carverSeed, int x, int z) {
+    public static ArrayList<Long> reverseCarverSeed(long carverSeed, int x, int z) {
 
         ArrayList<Long> results = new ArrayList<>();
 

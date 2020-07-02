@@ -1,36 +1,35 @@
 package mjtb49.hashreversals;
 
-import mjtb49.hashreversals.CarverReversalHelper;
-import mjtb49.hashreversals.MultiChunkHelper;
-import mjtb49.hashreversals.PopulationReversalHelper;
+import kaptainwutax.seedutils.mc.MCVersion;
+import kaptainwutax.seedutils.mc.pos.CPos;
+import kaptainwutax.seedutils.util.UnsupportedVersion;
+import kaptainwutax.seedutils.util.math.Mth;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.math.BigInteger;
 
 public class ChunkRandomReverser {
 
     private final int NUM_CHUNKS_ON_AXIS = 1875000;
-    private final long MASK48 = ((1L << 48) - 1);
-    private final long BEEG = (1L << 48);
+    private final long BEEG = Mth.pow2(48);
 
-    public Point reverseTerrainSeed(long terrainSeed) {
+    public CPos reverseTerrainSeed(long terrainSeed) {
         return reverseTerrainSeed(terrainSeed, -NUM_CHUNKS_ON_AXIS, NUM_CHUNKS_ON_AXIS, -NUM_CHUNKS_ON_AXIS, NUM_CHUNKS_ON_AXIS);
     }
 
-    public Point reverseTerrainSeed(long terrainSeed, int minX, int maxX, int minZ, int maxZ) {
+    public CPos reverseTerrainSeed(long terrainSeed, int minX, int maxX, int minZ, int maxZ) {
         //12354965 , 2831608 is the smallest vector along which the terrain seed remains unchanged.
         //989088 , 23009024
 
         // 23009024 , -2831608
         //-989088 , 12354965
-        long firstSolutionZ = (211541297333629L * terrainSeed) & MASK48;
+        long firstSolutionZ = (211541297333629L * terrainSeed) & Mth.MASK_48;
         BigInteger trueMaxX = BigInteger.valueOf(minX);
         BigInteger trueMinX = BigInteger.valueOf(maxX);
         BigInteger trueMaxZ = BigInteger.valueOf(maxZ - firstSolutionZ);
         BigInteger trueMinZ = BigInteger.valueOf(minZ - firstSolutionZ);
 
-        //ROunding properly is hard
+        //Rounding properly is hard
         long maxXT = trueMaxX.multiply(BigInteger.valueOf(23009024)).add(trueMinZ.multiply(BigInteger.valueOf(-989088))).divide(BigInteger.valueOf(BEEG)).longValue();
         long minXT = trueMinX.multiply(BigInteger.valueOf(23009024)).add(trueMaxZ.multiply(BigInteger.valueOf(-989088))).divide(BigInteger.valueOf(BEEG)).longValue();
         long maxZT = trueMinX.multiply(BigInteger.valueOf(-2831608)).add(trueMaxZ.multiply(BigInteger.valueOf(12354965))).divide(BigInteger.valueOf(BEEG)).longValue();
@@ -43,23 +42,27 @@ public class ChunkRandomReverser {
                 long tempX = 12354965L * i +  989088L * j; //  +
                 long tempZ = 2831608L* i + 23009024L * j + firstSolutionZ;
                 if (minX <= tempX && tempX <= maxX && minZ <= tempZ && tempZ <= maxZ) {
-                    return new Point((int)tempX, (int) tempZ);
+                    return new CPos((int)tempX, (int) tempZ);
                 }
             }
         }
         return null;
     }
 
-    public long setTerrainSeed(long chunkX, long chunkZ) {
-        return (chunkX * 341873128712L + chunkZ * 132897987541L) & MASK48;
+    public long setTerrainSeed(long chunkX, long chunkZ, MCVersion version) {
+        return (chunkX * 341873128712L + chunkZ * 132897987541L) & Mth.MASK_48;
     }
 
-    public Point reverseRegionSeed(long regionSeed, long worldSeed, int salt) {
-        return reverseTerrainSeed(regionSeed - (worldSeed & MASK48) - salt);
+    public CPos reverseRegionSeed(long regionSeed, long worldSeed, int salt, MCVersion version) {
+        return reverseTerrainSeed(regionSeed - (worldSeed & Mth.MASK_48) - salt);
     }
 
-    public long reverseDecoratorSeed(long decoratorSeed, int index, int step) {
-        return (decoratorSeed - index - 10000 * step) & MASK48;
+    public long reverseDecoratorSeed(long decoratorSeed, int index, int step, MCVersion version) {
+        if(version.isOlderThan(MCVersion.v1_13)) {
+            throw new UnsupportedVersion(version, "decorator seed");
+        }
+
+        return (decoratorSeed - index - 10000 * step) & Mth.MASK_48;
     }
 
     /**
@@ -69,25 +72,13 @@ public class ChunkRandomReverser {
      * @param z the z chunk coordinate to find the seed at
      * @return list of worldseeds with the given population seed at the desired location
      */
-    public ArrayList<Long> reversePopulationSeed(long seed, int x, int z) {
-        return reversePopulationSeed( seed & MASK48,  x,  z, false);
-    }
+    public ArrayList<Long> reversePopulationSeed(long seed, int x, int z, MCVersion version) {
+        //TODO: Kill this eventually.
+        if(version.isOlderThan(MCVersion.v1_13)) {
+            return PopulationReverser.getSeedFromChunkseedPre13(seed & Mth.MASK_48, x, z);
+        }
 
-    //TODO Make this work in chunks with more than 8 or 16 trailing 0s
-
-    /**
-     * Reverses the population seed hash (x*nextLong() + z*nextLong() ^ seed)
-     * @param seed the population seed
-     * @param x the x chunk coordinate to find the seed at
-     * @param z the z chunk coordinate to find the seed at
-     * @param beforeRelease13 boolean indicating whether the chunkseed was created by a version of minecraft before
-     *                        release 1.13
-     * @return list of worldseeds with the given population seed at the desired location
-     */
-    public ArrayList<Long> reversePopulationSeed(long seed, int x, int z, boolean beforeRelease13) {
-        if (beforeRelease13)
-            return PopulationReversalHelper.getSeedFromChunkseedPre13(seed & MASK48,x,z);
-        return PopulationReversalHelper.getSeedFromChunkseed13Plus(seed & MASK48,x,z);
+        return PopulationReverser.reverse(seed & Mth.MASK_48, x, z, version);
     }
 
     /**
@@ -98,8 +89,7 @@ public class ChunkRandomReverser {
      * @return a list of worldseeds with the given carver seed at the desired location
      */
     public ArrayList<Long> reverseCarverSeed(long carverSeed, int x, int z) {
-        CarverReversalHelper c = new CarverReversalHelper();
-        return c.reverseCarverSeed(carverSeed & MASK48, x ,z);
+        return CarverReversalHelper.reverseCarverSeed(carverSeed & Mth.MASK_48, x ,z);
     }
 
     /**
