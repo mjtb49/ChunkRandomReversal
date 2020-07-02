@@ -6,6 +6,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 
 public class FindSolutionsInBox {
+
     protected static TwoDimBigMatrix lagrangeGauss(TwoDimBigMatrix matrix) {
         TwoDimBigMatrix r = new TwoDimBigMatrix(matrix);
         do {
@@ -73,14 +74,5 @@ public class FindSolutionsInBox {
             }
         }
         return validCoords;
-    }
-
-    public static void main(String[] args) {
-        BigDecimal a = BigDecimal.valueOf(-5);
-        BigDecimal b = a.negate();
-        for (TwoDimBigVector v : findSolutionsInBox(3,5, 4,9,64, new TwoDimBigVector(a,a), new TwoDimBigVector(b,b))) {
-            System.out.println(v);
-        }
-
     }
 }
