@@ -7,7 +7,7 @@ public class TwoDimBigMatrix {
 
     private BigDecimal[][] matrix;
     private final int SIZE = 2;
-    private final int SCALE = 15;
+    private final int SCALE = 200;
 
     protected TwoDimBigMatrix() {
         matrix = new BigDecimal[SIZE][SIZE];

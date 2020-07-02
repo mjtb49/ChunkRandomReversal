@@ -50,15 +50,16 @@ public class FindSolutionsInBox {
         //Overkill - gets mins and maxes for what x and z in the space transformed by inv can be
         BigDecimal[] transformedMins = {BigDecimal.ZERO, BigDecimal.ZERO};
         BigDecimal[] transformedMaxes = {BigDecimal.ZERO, BigDecimal.ZERO};
+
         for (int row = 0; row < 2; row++) {
             for (int col = 0; col < 2; col++) {
                 BigDecimal element = inv.getElement(row,col);
-                if (element.compareTo(BigDecimal.ZERO) >= 0) {
-                    transformedMaxes[row] = transformedMaxes[row].add(element.multiply(max.getElement(col)));
-                    transformedMins[row] = transformedMins[row].add(element.multiply(min.getElement(col)));
+                if (element.signum() >= 0) {
+                    transformedMaxes[col] = transformedMaxes[col].add(element.multiply(max.getElement(row)));
+                    transformedMins[col] = transformedMins[col].add(element.multiply(min.getElement(row)));
                 } else {
-                    transformedMins[row] = transformedMaxes[row].add(element.multiply(max.getElement(col)));
-                    transformedMaxes[row] = transformedMins[row].add(element.multiply(min.getElement(col)));
+                    transformedMaxes[col] = transformedMaxes[col].add(element.multiply(min.getElement(row)));
+                    transformedMins[col] = transformedMins[col].add(element.multiply(max.getElement(row)));
                 }
             }
         }
