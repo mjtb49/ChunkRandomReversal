@@ -70,8 +70,8 @@ public class ChunkRandomReverserTest {
     public void getWorldseedFromTwoChunkseeds() {
         ChunkRand cr = new ChunkRand();
         ChunkRandomReverser device = new ChunkRandomReverser();
-        Random r = new Random(TESTING_SEED + 100);
-        for (int i = 0; i < 10; i++) {
+        Random r = new Random();
+        for (int i = 0; i < 100; i++) {
             long seed = r.nextLong() & ((1L << 48) - 1);
             int x1 = r.nextInt(2*1875000) - 1875000;
             int z1 = r.nextInt(2*1875000) - 1875000;
@@ -80,7 +80,7 @@ public class ChunkRandomReverserTest {
             long cs1 = cr.setPopulationSeed(seed,x1*16,z1*16,MCVersion.v1_16);
             long cs2 = cr.setPopulationSeed(seed,x2*16,z2*16,MCVersion.v1_16);
             boolean foundSeed = false;
-            for (MultiChunkHelper.Result result: device.getWorldseedFromTwoChunkseeds(cs1, cs2, x2 - x1, z2 - z1)) {
+            for (MultiChunkHelper.Result result: device.getWorldseedFromTwoChunkseeds(cs1, cs2, x2 - x1, z2 - z1, MCVersion.v1_16)) {
                 foundSeed |= (result.getBitsOfSeed() == seed) && (x1*16 == result.getX()) && (z1 * 16 == result.getZ());
             }
             Assert.assertTrue(foundSeed);

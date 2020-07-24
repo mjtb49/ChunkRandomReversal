@@ -1,5 +1,7 @@
 package mjtb49.hashreversals;
 
+import kaptainwutax.seedutils.mc.MCVersion;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -54,18 +56,24 @@ public class MultiChunkHelper {
         return ((x*a + z*b)^seed) & ((1L << 48) - 1);
     }
 
-    ArrayList<Result> getWorldseedFromTwoChunkseeds(long chunkseed1, long chunkseed2, int blockDx, int blockDz) {
+    ArrayList<Result> getWorldseedFromTwoChunkseeds(long chunkseed1, long chunkseed2, int blockDx, int blockDz, MCVersion version) {
         results = new ArrayList<>();
         this.dx = blockDx;
         this.dz = blockDz;
         k1 = chunkseed1;
         k2 = chunkseed2;
-        for (long c = 0; c < (1L << 17); c++) {
-            growSolution(c,17);
+
+        if (version.isOlderThan(MCVersion.v1_12)) {
+            throw new UnsupportedOperationException("Cannot do multichunk on versions older than 1.13");
+        } else {
+            for (long c = k1 & 0xf; c < (1L << 16); c += 16) {
+                growSolution(c, 16);
+            }
+            for (long seed : seeds)
+                results.addAll(findSeedsInWB(chunkseed1, seed));
+            return results;
         }
-        for (long seed: seeds)
-            results.addAll(findSeedsInWB(chunkseed1,seed));
-        return results;
+
     }
 
     private void growSolution(long c, int bitsOfSeedKnown) {
